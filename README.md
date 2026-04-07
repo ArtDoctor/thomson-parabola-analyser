@@ -20,11 +20,23 @@ bash setup.sh
 source venv/bin/activate
 ```
 
-Run one image through the CLI (point at your detector file — here `example.png` is a convenient local example when present):
+Run one image through the CLI (`example.png` in the repo root is a synthetic detector render you can use out of the box):
 
 ```bash
 python main.py example.png --output-dir outputs --add-plots
 ```
+
+### Example synthetic image and classification
+
+The figures below come from running the command above on `example.png`. The second image is the pipeline’s merged-and-classified view with dashed geometric fits over the denoised, rotation-corrected view.
+
+**Example of synthetic image**
+
+![Example of synthetic image](example.png)
+
+**Example of classification** (merged traces, dashed fitted parabolas, species labels)
+
+![Example of classification](docs/assets/readme_example_classification.png)
 
 ## Inputs And Models
 
