@@ -88,12 +88,7 @@ def build_lines(
                 if (px, py) in active_lines:
                     line_id = active_lines[(px, py)]
                     line_pts = lines[line_id]
-                    if (
-                        image_width is not None
-                        and dist < 3
-                        and cx >= image_width - 50
-                        and len(line_pts) >= 10
-                    ):
+                    if image_width is not None and dist < 3 and cx >= image_width - 50 and len(line_pts) >= 10:
                         continue
                     if len(line_pts) >= 2:
                         prev_dx = line_pts[-1][1] - line_pts[-2][1]

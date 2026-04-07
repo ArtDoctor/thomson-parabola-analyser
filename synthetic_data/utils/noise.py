@@ -53,7 +53,7 @@ BP_VARIATION_STRENGTH = 8.0     # Amplitude of the slow spatial variation
 # 7. Gradient Blob Parameters
 GB_NUM_BLOBS = 2                # Number of large Gaussian blobs to add
 GB_SIGMA_RANGE: tuple[float, float] = (200.0, 600.0)   # Range for blob sigma (pixels)
-GB_INTENSITY_RANGE: tuple[float, float] = (10.0, 40.0) # Range for blob peak intensity (gray levels)
+GB_INTENSITY_RANGE: tuple[float, float] = (10.0, 40.0)  # Range for blob peak intensity (gray levels)
 # ==========================================
 
 
@@ -78,7 +78,7 @@ def apply_white_spots(arr: np.ndarray, light_vector: tuple[float, float, float] 
         ys = y[mask_r]
         xs = x[mask_r]
         bs = brightness[mask_r]
-        yy, xx = np.mgrid[-r : r + 1, -r : r + 1]
+        yy, xx = np.mgrid[-r: r + 1, -r: r + 1]
         dist_sq = xx.astype(np.float32) ** 2 + yy.astype(np.float32) ** 2
         circle = dist_sq <= r * r
         dys = yy[circle]

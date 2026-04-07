@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 
-logger = logging.getLogger(__name__)
 from oblisk.analysis.geometry import (
     from_rotated_frame,
     to_rotated_frame,
@@ -14,6 +13,8 @@ from oblisk.analysis.geometry import (
 from oblisk.analysis.background import BackgroundRoi, compute_background_mean
 from oblisk.analysis.energy import energies_keV_from_xp_m
 from oblisk.config import Settings
+
+logger = logging.getLogger(__name__)
 
 
 def magnet_calibration_sorted_matrix(settings: Settings) -> np.ndarray:
@@ -89,6 +90,7 @@ LfE_A = LfB_A - 9 * cm
 LfB_B = 29.5 * cm
 E_B = 0.13e6                        # V/m
 LfE_B = LfB_B - 9 * cm
+
 
 def get_hydrogen_a(
     m_per_px_img: float,

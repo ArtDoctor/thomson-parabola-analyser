@@ -2,8 +2,6 @@ import logging
 from pathlib import Path
 
 import numpy as np
-
-logger = logging.getLogger(__name__)
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from scipy.ndimage import gaussian_filter1d
@@ -17,6 +15,8 @@ from oblisk.analysis.spectra_core import _build_absolute_log_curves, _dedupe_nam
 from oblisk.analysis.spectra_models import AbsoluteSpectrumCurve, SpectraResult, SpectrumGeometry
 from oblisk.analysis.species import A_BY_SYM, parse_species
 from oblisk.plot_display import show_or_save
+
+logger = logging.getLogger(__name__)
 
 
 def plot_log_spectra_shared_absolute(

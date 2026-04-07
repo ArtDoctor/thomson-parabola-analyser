@@ -32,11 +32,7 @@ def _integrate_unique_band_pixels(
     y_pixel = np.zeros_like(y_samples, dtype=int)
     x_pixel[finite] = np.rint(x_samples[finite]).astype(int)
     y_pixel[finite] = np.rint(y_samples[finite]).astype(int)
-    in_bounds = (
-        finite
-        & ((x_pixel >= 0) & (x_pixel < width))
-        & ((y_pixel >= 0) & (y_pixel < height))
-    )
+    in_bounds = finite & ((x_pixel >= 0) & (x_pixel < width)) & ((y_pixel >= 0) & (y_pixel < height))
     if not np.any(in_bounds):
         return np.zeros(n_xp, dtype=float)
 

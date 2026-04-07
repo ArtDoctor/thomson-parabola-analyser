@@ -4,8 +4,6 @@ from typing import Any
 
 import numpy as np
 
-logger = logging.getLogger(__name__)
-
 from oblisk.analysis.classification import (
     detect_isolated_hydrogen,
     select_magnet_calibration_and_classify,
@@ -13,6 +11,8 @@ from oblisk.analysis.classification import (
 from oblisk.analysis.physics import make_Xp_span_rot
 from oblisk.config import Settings
 from oblisk.reporting.pipeline_log import HydrogenReferenceLog
+
+logger = logging.getLogger(__name__)
 
 
 def run_classification_and_xp_span(

@@ -205,8 +205,7 @@ def fit_global_origin_with_rotation(
     }
     p0_profile = np.array([x0_stage1, y0_stage1, theta_stage1], dtype=float)
     best_profile_cost = float(
-        0.5
-        * np.sum(
+        0.5 * np.sum(
             ws.fixed_tilt_profile_residuals(
                 p0_profile,
                 gamma_fixed=0.0,
@@ -215,8 +214,7 @@ def fit_global_origin_with_rotation(
                 k2_fixed=k2_stage1,
                 x0_ref=x0_stage1,
                 y0_ref=y0_stage1,
-            )
-            ** 2
+            ) ** 2
         )
     )
     path_profile.append(

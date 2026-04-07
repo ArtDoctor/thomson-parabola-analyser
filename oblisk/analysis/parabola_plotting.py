@@ -74,11 +74,8 @@ def plot_lines_rotated(
 
             x_vals_fit = x_vals
             y_vals_fit = y_vals
-            if (
-                (abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15)
-                and img_center is not None
-                and img_diag is not None
-            ):
+            use_distortion = abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15
+            if use_distortion and img_center is not None and img_diag is not None:
                 x_vals_fit, y_vals_fit = undistort_points(
                     x_vals,
                     y_vals,
@@ -123,11 +120,7 @@ def plot_lines_rotated(
             )
 
             xf, yf = from_rotated_frame(Xp_fit, Yp_fit, x0_fit, y0_fit, theta_fit)
-            if (
-                (abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15)
-                and img_center is not None
-                and img_diag is not None
-            ):
+            if use_distortion and img_center is not None and img_diag is not None:
                 xf, yf = distort_points(
                     xf,
                     yf,

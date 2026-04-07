@@ -69,11 +69,8 @@ def per_line_parabola_fit_errors(
     line_counts[line_counts == 0.0] = 1.0
     weights_per_point = 1.0 / np.sqrt(line_counts[l_arr])
 
-    if (
-        (abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15)
-        and img_center is not None
-        and img_diag is not None
-    ):
+    use_distortion = abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15
+    if use_distortion and img_center is not None and img_diag is not None:
         cx, cy = img_center
         r_norm = max(img_diag * 0.5, 1.0)
         x_u, y_u = undistort_points(x, y, cx, cy, k1_fit, r_norm, k2=k2_fit)

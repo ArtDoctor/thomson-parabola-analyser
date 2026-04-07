@@ -2,11 +2,11 @@ import collections
 import logging
 
 import numpy as np
-
-logger = logging.getLogger(__name__)
 from pydantic import BaseModel
 
 from oblisk.config import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class MergeLinesResult(BaseModel):
@@ -185,11 +185,7 @@ def _predictive_trace_from_peaks(
                         continue
                     if not (px >= cx - tol_x and py >= cy - tol_y):
                         continue
-                    if (
-                        dcol < 5
-                        and cx >= image_width - edge_margin_px
-                        and len(lines[line_id]) >= 5
-                    ):
+                    if dcol < 5 and cx >= image_width - edge_margin_px and len(lines[line_id]) >= 5:
                         continue
                     if len(lines[line_id]) >= 2:
                         prev_dx = lines[line_id][-1][1] - lines[line_id][-2][1]
@@ -296,11 +292,8 @@ def _stitch_polylines_one_round(
                     continue
                 x_pred = xa + ma * (yb - ya)
                 dx = abs(x_pred - xb)
-                if (
-                    xa >= image_width - edge_margin_px
-                    and xb >= image_width - edge_margin_px
-                    and abs(xa - xb) < 3
-                ):
+                both_near_right = xa >= image_width - edge_margin_px and xb >= image_width - edge_margin_px
+                if both_near_right and abs(xa - xb) < 3:
                     continue
                 m_diff = abs(ma - mb)
                 if dx > max_bridge_dx or m_diff > max_m_diff:

@@ -91,7 +91,7 @@ def _apply_inner_margin_crop(image: np.ndarray, margin_px: int) -> np.ndarray:
     width = int(image.shape[1])
     if height <= 2 * margin_px or width <= 2 * margin_px:
         return image
-    return image[margin_px : height - margin_px, margin_px : width - margin_px]
+    return image[margin_px:height - margin_px, margin_px:width - margin_px]
 
 
 class PreprocessedImage(BaseModel):

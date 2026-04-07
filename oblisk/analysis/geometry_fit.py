@@ -6,6 +6,8 @@ from oblisk.analysis.geometry import (
     to_rotated_frame,
     undistort_points,
 )
+
+
 def perspective_reference_from_lines(
     filtered_lines: list[list[list[int]]],
     x0_fit: float,
@@ -30,11 +32,8 @@ def perspective_reference_from_lines(
 
     x = np.concatenate(x_list)
     y = np.concatenate(y_list)
-    if (
-        (abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15)
-        and img_center is not None
-        and img_diag is not None
-    ):
+    use_distortion = abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15
+    if use_distortion and img_center is not None and img_diag is not None:
         radius_norm = max(img_diag * 0.5, 1.0)
         x, y = undistort_points(
             x,

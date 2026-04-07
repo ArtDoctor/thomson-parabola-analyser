@@ -318,7 +318,7 @@ def _overlay_spot_impl(
     if w <= 0 or h <= 0:
         return base_array
 
-    spot_patch = spot_array[sy_start : sy_start + h, sx_start : sx_start + w].astype(
+    spot_patch = spot_array[sy_start:sy_start + h, sx_start:sx_start + w].astype(
         np.float32
     )
     contribution = np.maximum(spot_patch - subtract_background, 0.0)
@@ -333,10 +333,10 @@ def _overlay_spot_impl(
         contribution *= mask
 
     result = base_array.copy()
-    base_patch = result[dy_start : dy_start + h, dx_start : dx_start + w].astype(
+    base_patch = result[dy_start:dy_start + h, dx_start:dx_start + w].astype(
         np.float32
     )
-    result[dy_start : dy_start + h, dx_start : dx_start + w] = np.clip(
+    result[dy_start:dy_start + h, dx_start:dx_start + w] = np.clip(
         base_patch + contribution, 0, 255
     ).astype(base_array.dtype)
     return result
@@ -413,7 +413,9 @@ def main() -> None:
         brightness_scale = rng.uniform(0.2, 1.0)
         print(
             f"[base {base_index + 1}/{NUM_SYNTHETIC_IMAGES}] "
-            f"species={','.join(plan.species)} | {describe_constants(plan.constants)} | brightness={brightness_scale:.2f}"
+            f"species={','.join(plan.species)} | "
+            f"{describe_constants(plan.constants)} | "
+            f"brightness={brightness_scale:.2f}"
         )
         base_image = generate_base_image(plan, brightness_scale)
 

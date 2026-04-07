@@ -42,12 +42,7 @@ def bilinear_sample(
     ic = image[y1m, x0m].astype(float)
     id_val = image[y1m, x1m].astype(float)
 
-    samples_mask = (
-        ia * (1 - dx) * (1 - dy)
-        + ib * dx * (1 - dy)
-        + ic * (1 - dx) * dy
-        + id_val * dx * dy
-    )
+    samples_mask = ia * (1 - dx) * (1 - dy) + ib * dx * (1 - dy) + ic * (1 - dx) * dy + id_val * dx * dy
 
     samples[mask] = samples_mask
     return samples
@@ -241,11 +236,8 @@ def score_parabolas_over_a(
     h, w = image.shape[:2]
     xp_dense = np.linspace(Xp_min_raw, Xp_max_raw, n_samples_per_parabola)
 
-    do_distort_score = (
-        (abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15)
-        and img_center is not None
-        and img_diag is not None
-    )
+    use_distortion = abs(k1_fit) > 1e-15 or abs(k2_fit) > 1e-15
+    do_distort_score = use_distortion and img_center is not None and img_diag is not None
     cx_s = 0.0
     cy_s = 0.0
     r_s = 1.0

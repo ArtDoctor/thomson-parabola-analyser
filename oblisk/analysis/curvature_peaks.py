@@ -34,7 +34,7 @@ def _split_merged_peaks(
             else n - 1
         )
         right_bound = max(left_bound, min(right_bound, n - 1))
-        segment = scores[left_bound : right_bound + 1]
+        segment = scores[left_bound:right_bound + 1]
         if segment.size < 3:
             refined.append(peak_idx)
             continue
@@ -287,21 +287,14 @@ def plot_a_score_and_peaks(
             markeredgewidth=2,
             label=f"detected peaks ({len(good_a)})",
         )
-    has_half_width_data = (
-        peak_left_a is not None
-        and peak_right_a is not None
-        and half_height_scores is not None
-    )
+    has_half_width_data = peak_left_a is not None and peak_right_a is not None and half_height_scores is not None
     if has_half_width_data:
         left_a_vals = peak_left_a
         right_a_vals = peak_right_a
         half_height_vals = half_height_scores
         assert left_a_vals is not None and right_a_vals is not None and half_height_vals is not None
-        if (
-            len(left_a_vals) == len(peak_indices)
-            and len(right_a_vals) == len(peak_indices)
-            and len(half_height_vals) == len(peak_indices)
-        ):
+        n_peaks = len(peak_indices)
+        if all(len(v) == n_peaks for v in (left_a_vals, right_a_vals, half_height_vals)):
             for i, (left_a, right_a, half_height) in enumerate(
                 zip(left_a_vals, right_a_vals, half_height_vals)
             ):

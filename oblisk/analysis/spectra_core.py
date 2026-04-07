@@ -127,13 +127,10 @@ def build_spectra_result(
         same_mq = [name for name in same_mq_names(line.candidates) if name != best_match.name]
 
         integration_window = None
-        if (
-            (integration_windows_a is not None)
-            and (line_index < len(integration_windows_a))
-            and (len(integration_windows_a[line_index]) == 2)
-        ):
-            left_a = float(integration_windows_a[line_index][0])
-            right_a = float(integration_windows_a[line_index][1])
+        iw = integration_windows_a
+        if iw is not None and line_index < len(iw) and len(iw[line_index]) == 2:
+            left_a = float(iw[line_index][0])
+            right_a = float(iw[line_index][1])
             integration_window = (left_a, right_a)
 
         energies_keV, weights, polyline = _sample_single_spectrum(
@@ -245,11 +242,8 @@ def _build_absolute_log_curves(
         if spectrum.energies_keV.size == 0:
             y_abs = np.zeros_like(centers)
         else:
-            in_range = (
-                (spectrum.energies_keV >= e_min_log_keV)
-                & (spectrum.energies_keV <= e_max_log_keV)
-                & np.isfinite(spectrum.energies_keV)
-            )
+            ek = spectrum.energies_keV
+            in_range = (ek >= e_min_log_keV) & (ek <= e_max_log_keV) & np.isfinite(ek)
             energies_in = spectrum.energies_keV[in_range]
             weights_in = spectrum.weights[in_range]
             histogram, _ = np.histogram(energies_in, bins=bins, weights=weights_in)

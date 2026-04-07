@@ -11,6 +11,7 @@ ipympl==0.9.7
 pillow==11.2.1
 pydantic==2.11.7
 pytest==9.0.2
+flake8==7.3.0
 mypy==1.19.1
 scipy-stubs
 ultralytics
