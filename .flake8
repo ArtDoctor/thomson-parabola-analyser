@@ -1,0 +1,10 @@
+[flake8]
+# Ignore trailing whitespace errors
+ignore = W291, W293
+# W291: trailing whitespace
+# W293: blank line contains whitespace
+
+# Matplotlib backend + sys.path must run before project imports
+per-file-ignores =
+    web/backend/main.py: E402
+    oblisk/analysis/spectra.py: F401

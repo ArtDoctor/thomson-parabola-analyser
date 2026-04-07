@@ -1,0 +1,31 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.pytest_cache/
+.mypy_cache/
+outputs/
+web/frontend/node_modules/
+web/node_modules/
+web/frontend/dist/
+docs/
+.vscode/
+.cursor/
+*.ipynb
+
+# Local evaluation / synthetic datasets
+eval/
+eval_min/
+synthetic_data/
+papers/
+scheme.png
+tests/
+oblisk.egg-info/
+.cursor/
+
+# Training runs and checkpoints
+yolo-tune/**
+!yolo-tune/thomson-cutter.onnx
+unet-denoiser/**
+!unet-denoiser/unet_denoise_best.pth

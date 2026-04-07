@@ -1,0 +1,125 @@
+
+.spec-param-input::-webkit-inner-spin-button,
+.spec-param-input::-webkit-outer-spin-button {
+  opacity: 0.3;
+}
+
+.spec-param-unit {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Info icon */
+.spec-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-style: italic;
+  color: rgba(186, 196, 212, 0.75);
+  cursor: help;
+  flex-shrink: 0;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+  user-select: none;
+}
+
+.spec-info:hover {
+  border-color: rgba(45, 212, 191, 0.4);
+  color: var(--accent2);
+  background: rgba(45, 212, 191, 0.08);
+}
+
+/* Floating tooltip */
+.spec-tooltip {
+  position: fixed;
+  z-index: 99999;
+  max-width: 260px;
+  padding: 10px 13px;
+  background: rgba(5, 6, 7, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.18);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.spec-tooltip--visible {
+  opacity: 1;
+}
+
+/* Opens spectrometer dialog from analysis settings */
+.btn-open-spectrometer {
+  align-self: flex-start;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--accent3);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), color var(--transition);
+}
+
+.btn-open-spectrometer:hover {
+  border-color: rgba(45, 212, 191, 0.3);
+  background: rgba(45, 212, 191, 0.06);
+  color: var(--accent2);
+}
+
+/* Reset button */
+.btn-spec-reset {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  margin-right: auto;
+}
+
+.btn-spec-reset:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--text-secondary);
+}
+
+/* Dialog entrance animation */
+.spec-dialog[open] {
+  animation: specDialogIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes specDialogIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Beam animation */
+.spec-beam-line {
+  stroke-dasharray: 8, 6;
+}

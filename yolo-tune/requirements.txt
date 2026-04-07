@@ -1,0 +1,5 @@
+label-studio
+tifffile
+Pillow
+ultralytics
+ipykernel

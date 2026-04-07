@@ -1,0 +1,14 @@
+{
+  "name": "oblisk-web-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:debug": "playwright test --debug",
+    "e2e:install": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1"
+  }
+}

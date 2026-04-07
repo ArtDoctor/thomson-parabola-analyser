@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Results – Oblisk</title>
+  <meta name="description" content="Thomson parabola analysis results, plots, and energy spectra." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <a href="/" class="logo-link">
+          <span class="logo-icon">⚛</span>
+          <span class="logo-text">Oblisk</span>
+          <span class="logo-sub">Thomson Parabola Analyser</span>
+        </a>
+      </div>
+      <div class="header-right">
+        <button
+          type="button"
+          class="btn-recent-analyses hidden"
+          id="btn-recent-analyses"
+          aria-label="Recent analyses"
+          aria-expanded="false"
+          aria-controls="recent-sidebar"
+        >
+          <span class="btn-recent-analyses-icon" aria-hidden="true"></span>
+        </button>
+        <a href="/" class="btn-new-analysis" target="_blank" rel="noopener noreferrer">+ New Analysis</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="results-page">
+    <!-- Status banner -->
+    <div class="status-banner" id="status-banner">
+      <div class="status-spinner" id="status-spinner"></div>
+      <span class="status-text" id="status-text">Initialising…</span>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- Plots grid -->
+    <section class="plots-section">
+      <h2 class="section-title">Analysis Plots</h2>
+      <p class="section-file-name hidden" id="plots-file-name" aria-live="polite"></p>
+      <p class="section-sub" id="plots-sub">Plots will appear as processing progresses.</p>
+      <div class="plots-grid" id="plots-grid">
+        <!-- plot cards injected by JS -->
+      </div>
+    </section>
+
+    <!-- Interactive Viewer -->
+    <section class="iv-section hidden" id="iv-section">
+      <h2 class="section-title">Interactive Detector View</h2>
+      <p class="section-sub">Hover parabolas for species details. Click for energy spectrum. Move cursor to see m/q ratio.</p>
+      <div class="iv-container" id="iv-container"></div>
+    </section>
+
+    <!-- Result JSON -->
+    <section class="result-section hidden" id="result-section">
+      <div class="run-summary" id="run-summary">
+        <h2 class="section-title">Run summary</h2>
+        <p class="section-sub run-summary-sub">Pipeline timings and key decision points from the trace.</p>
+        <div class="run-summary-grid">
+          <div class="timings-card" id="timings-card">
+            <h3 class="subsection-title">Step timings</h3>
+            <div class="timings-total-line" id="timings-total-line"></div>
+            <div class="timings-rows" id="timings-rows"></div>
+          </div>
+          <div class="trace-highlights-card">
+            <h3 class="subsection-title">Trace highlights</h3>
+            <div class="trace-highlights" id="trace-highlights"></div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="section-title section-title-spaced">Classification Results</h2>
+      <div class="result-export-row">
+        <button type="button" class="btn-export" id="export-json">Download JSON</button>
+        <button type="button" class="btn-export" id="export-txt">Download TXT</button>
+      </div>
+      <div class="result-cards" id="result-cards"></div>
+
+      <details class="algorithm-log-details hidden" id="algorithm-log-details">
+        <summary>Algorithm trace</summary>
+        <div class="algorithm-log" id="algorithm-log"></div>
+      </details>
+
+      <details class="raw-json-details">
+        <summary>Raw JSON</summary>
+        <pre class="raw-json" id="raw-json"></pre>
+      </details>
+    </section>
+
+    <!-- Error state -->
+    <div class="error-banner hidden" id="error-banner">
+      <span class="error-icon">⚠</span>
+      <div>
+        <strong>Processing failed</strong>
+        <p id="error-detail"></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="site-footer-inner">
+      <p class="site-footer-line">
+        This website is developed at the <strong>Czech Technical University in Prague</strong>,
+        Faculty of Nuclear Sciences and Physical Engineering.
+      </p>
+      <p class="site-footer-line">
+        Main developer: Artem Shelamanov.
+        Contact:
+        <a href="mailto:artdoctorka@gmail.com">artdoctorka@gmail.com</a> (personal),
+        <a href="mailto:shelaart@cvut.cz">shelaart@cvut.cz</a> (university).
+      </p>
+      <p class="site-footer-year">© 2026</p>
+    </div>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox hidden" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="" />
+    <p class="lightbox-caption" id="lightbox-caption"></p>
+  </div>
+
+  <div class="recent-overlay hidden" id="recent-overlay" aria-hidden="true"></div>
+  <aside
+    class="recent-sidebar"
+    id="recent-sidebar"
+    aria-label="Recent analyses"
+    aria-hidden="true"
+  >
+    <div class="recent-sidebar-head">
+      <h2 class="recent-sidebar-title">Recent analyses</h2>
+      <button type="button" class="recent-sidebar-close" id="recent-sidebar-close" aria-label="Close">
+        ✕
+      </button>
+    </div>
+    <div class="recent-list" id="recent-list"></div>
+  </aside>
+
+  <script src="/results.ts" type="module"></script>
+</body>
+</html>

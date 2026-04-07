@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: ..          # oblisk project root (needed to COPY the whole project)
+      dockerfile: web/Dockerfile
+    restart: unless-stopped
+    # No host ports: multiple Coolify apps on one server each get their own proxy route;
+    # a fixed "32212:32212" bind collides across instances. Coolify reaches :32212 on the
+    # container network. For local docker compose, use: docker compose run --publish 32212 ...
+    expose:
+      - "32212"
+    volumes:
+      - oblisk_data:/app/data
+    environment:
+      DATA_DIR: /app/data
+      PYTHONPATH: /app/oblisk
+
+volumes:
+  oblisk_data:
+    driver: local

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" role="img" aria-labelledby="sl-title">
+  <title id="sl-title">Thomson parabola spectrometer: E field, B field, and detector</title>
+  <defs>
+    <pattern id="sl-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M16 0H0V16" fill="none" stroke="rgba(45,212,191,0.06)" stroke-width="0.5"/>
+    </pattern>
+    <linearGradient id="sl-beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(45,212,191,0.85)"/>
+      <stop offset="100%" stop-color="rgba(45,212,191,0.2)"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="200" fill="#0a0b0d"/>
+  <rect width="640" height="200" fill="url(#sl-grid)"/>
+  <style>
+    .sl-part { transition: opacity 0.18s ease, stroke-width 0.18s ease; cursor: default; }
+    .sl-part:hover { opacity: 1 !important; }
+    .sl-hint { font: 500 9px IBM Plex Sans, system-ui, sans-serif; fill: #6b7280; }
+    .sl-cap { font: 600 10px IBM Plex Sans, system-ui, sans-serif; fill: #e2e8f0; }
+  </style>
+  <text x="320" y="22" text-anchor="middle" class="sl-cap">Ion beam &#8594; parallel E and B &#8594; parabolas on the detector</text>
+  <line x1="48" y1="102" x2="300" y2="102" stroke="url(#sl-beam)" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <g class="sl-part" opacity="0.78" stroke="#94a3b8" fill="rgba(45,212,191,0.05)">
+    <ellipse cx="52" cy="102" rx="12" ry="28"/>
+    <circle cx="52" cy="102" r="2" fill="rgba(45,212,191,0.7)" stroke="none"/>
+    <text x="52" y="62" text-anchor="middle" class="sl-hint">Pinhole</text>
+  </g>
+  <g class="sl-part" opacity="0.75" stroke="rgba(251,191,36,0.55)" fill="rgba(251,191,36,0.06)">
+    <rect x="120" y="68" width="72" height="18" rx="2"/>
+    <rect x="120" y="118" width="72" height="18" rx="2"/>
+    <text x="156" y="48" text-anchor="middle" class="sl-hint">E plates</text>
+  </g>
+  <g class="sl-part" opacity="0.75" stroke="rgba(99,102,241,0.55)" fill="rgba(99,102,241,0.06)">
+    <rect x="232" y="74" width="56" height="16" rx="2"/>
+    <rect x="232" y="114" width="56" height="16" rx="2"/>
+    <text x="260" y="48" text-anchor="middle" class="sl-hint">B poles</text>
+  </g>
+  <g class="sl-part" opacity="0.85" stroke="rgba(45,212,191,0.45)" fill="none" stroke-width="1.4">
+    <path d="M300 102 Q400 103 520 108"/>
+    <path d="M300 102 Q398 105 518 118"/>
+    <path d="M300 102 Q396 107 516 128"/>
+    <path d="M300 102 Q394 109 514 138"/>
+    <text x="418" y="94" text-anchor="middle" class="sl-hint">Dispersion</text>
+  </g>
+  <g class="sl-part" opacity="0.8" stroke="rgba(45,212,191,0.5)" fill="rgba(45,212,191,0.04)">
+    <rect x="536" y="58" width="10" height="88" rx="2"/>
+    <text x="541" y="52" text-anchor="middle" class="sl-hint">Detector</text>
+  </g>
+</svg>

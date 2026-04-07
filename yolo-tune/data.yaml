@@ -1,0 +1,7 @@
+path: . # Root directory of your dataset
+train: images/train
+val: images/val
+
+# Classes 
+names:
+  0: main

@@ -1,0 +1,9 @@
+clean/
+noisy/
+checkpoints/
+wandb/
+old/
+denoised.png
+output/
+denoise_best_cur.pth
+test/

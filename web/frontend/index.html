@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oblisk – Thomson Parabola Analyser</title>
+  <meta name="description" content="Upload a Thomson parabola detector image and get automated identification of H, C, O, and Si ion species plus energy spectra. Images are rotated and flipped automatically for analysis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <a href="/" class="logo-link">
+          <span class="logo-icon">⚛</span>
+          <span class="logo-text">Oblisk</span>
+          <span class="logo-sub">Thomson Parabola Analyser</span>
+        </a>
+      </div>
+      <div class="header-right">
+        <button
+          type="button"
+          class="btn-recent-analyses hidden"
+          id="btn-recent-analyses"
+          aria-label="Recent analyses"
+          aria-expanded="false"
+          aria-controls="recent-sidebar"
+        >
+          <span class="btn-recent-analyses-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="site-main">
+  <section class="hero" aria-label="Upload and analyse">
+    <div class="hero-content">
+      <h1 class="hero-title">Analyze your<br /><span class="gradient-text">Thomson spectrometer image</span></h1>
+      <p class="hero-sub">Upload a raw detector image—the pipeline rotates and flips it automatically into the analysis frame—and leave the fitting, processing and plots preparation to us.</p>
+
+      <div class="upload-card" id="upload-card">
+        <div class="drop-zone" id="drop-zone">
+          <div class="drop-icon">📂</div>
+          <p class="drop-title">Drop image here</p>
+          <p class="drop-hint">PNG, JPEG, TIFF or BMP — or click to browse</p>
+          <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.tif,.tiff,.bmp" hidden />
+          <button class="btn-browse" id="btn-browse">Browse file</button>
+        </div>
+
+        <div class="selected-file hidden" id="selected-file">
+          <div class="selected-file-body">
+            <img class="file-preview hidden" id="file-preview" alt="" />
+            <div class="selected-file-info">
+              <span class="file-name" id="file-name"></span>
+              <button class="btn-clear" id="btn-clear" type="button" title="Remove">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-dialog-title">
+          <div class="settings-dialog-inner">
+            <h2 class="settings-dialog-title" id="settings-dialog-title">Analysis settings</h2>
+            <fieldset class="settings-fieldset settings-preset-fieldset">
+              <legend class="settings-legend">Saved preset</legend>
+              <label class="settings-preset-name-label" for="settings-preset-name">Name</label>
+              <input
+                type="text"
+                class="settings-preset-name-input"
+                id="settings-preset-name"
+                placeholder="e.g. Lab setup / campaign 2026"
+                maxlength="120"
+                autocomplete="off"
+              />
+              <p class="settings-hint settings-preset-hint">
+                Optional label for this configuration. Included when you export settings to JSON.
+              </p>
+              <div class="settings-preset-io">
+                <button type="button" class="btn-preset-io" id="btn-settings-export">
+                  Export…
+                </button>
+                <button type="button" class="btn-preset-io" id="btn-settings-import">
+                  Import…
+                </button>
+                <input
+                  type="file"
+                  id="settings-import-file"
+                  accept="application/json,.json"
+                  hidden
+                />
+              </div>
+            </fieldset>
+            <fieldset class="settings-fieldset">
+              <legend class="settings-legend">Denoising</legend>
+              <label class="settings-option">
+                <input type="radio" name="denoise-method" value="unet" id="denoise-unet" checked />
+                <span class="settings-option-text">
+                  <span class="settings-option-label">U-Net</span>
+                  <span class="settings-option-hint">Neural denoiser (default)</span>
+                </span>
+              </label>
+              <label class="settings-option">
+                <input type="radio" name="denoise-method" value="morph" id="denoise-morph" />
+                <span class="settings-option-text">
+                  <span class="settings-option-label">Morphological opening</span>
+                  <span class="settings-option-hint">Classical denoising, no model weights</span>
+                </span>
+              </label>
+            </fieldset>
+            <fieldset class="settings-fieldset">
+              <legend class="settings-legend">Ion species</legend>
+              <p class="settings-hint">Each element adds all charge states from 1+ through its atomic number (Z) to the classification ladder.</p>
+              <div class="species-row">
+                <div class="species-chips" id="species-chips"></div>
+                <button type="button" class="btn-species-edit" id="btn-species-edit" aria-expanded="false">Edit</button>
+              </div>
+              <div class="species-picker hidden" id="species-picker">
+                <div class="periodic-grid" id="periodic-grid" role="grid" aria-label="Periodic table"></div>
+                <p class="settings-hint species-foot">Click elements to add or remove. At least one must stay selected.</p>
+              </div>
+            </fieldset>
+            <fieldset class="settings-fieldset">
+              <legend class="settings-legend">Detector image</legend>
+              <label class="settings-option">
+                <input type="checkbox" id="inner-margin-crop" checked />
+                <span class="settings-option-text">
+                  <span class="settings-option-label">Trim detector edges</span>
+                  <span class="settings-option-hint">Remove 50 px from each side after auto crop (default)</span>
+                </span>
+              </label>
+            </fieldset>
+            <fieldset class="settings-fieldset">
+              <legend class="settings-legend">Spectrometer</legend>
+              <p class="settings-hint">Plate spacing, fields, and drifts for your Thomson parabola setup. These feed the backend when mapping detector positions to ion energy.</p>
+              <button type="button" class="btn-open-spectrometer" id="btn-spectrometer" title="Spectrometer geometry" aria-haspopup="dialog">
+                Spectrometer geometry…
+              </button>
+            </fieldset>
+            <div class="settings-dialog-actions">
+              <button type="button" class="btn-settings-reset" id="btn-settings-reset">Reset to defaults</button>
+              <button type="button" class="btn-settings-done" id="btn-settings-close">Done</button>
+            </div>
+          </div>
+        </dialog>
+
+        <!-- Spectrometer geometry dialog -->
+        <dialog class="settings-dialog settings-dialog-wide spec-dialog" id="spec-dialog" aria-labelledby="spec-dialog-title">
+          <div class="settings-dialog-inner spec-dialog-inner">
+            <div class="spec-header">
+              <h2 class="settings-dialog-title" id="spec-dialog-title">Spectrometer geometry</h2>
+              <p class="settings-hint">Configure the physical parameters of your Thomson parabola spectrometer. Hover over the schematic to highlight components.</p>
+            </div>
+
+            <div class="spec-layout">
+              <!-- SVG schematic -->
+              <div class="spec-schematic-wrap">
+                <svg class="spec-schematic" viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Grid background -->
+                  <defs>
+                    <pattern id="spec-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(45,212,191,0.06)" stroke-width="0.5"/>
+                    </pattern>
+                    <!-- Electric field glow filter -->
+                    <filter id="e-glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="4" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <!-- Magnetic field glow filter -->
+                    <filter id="b-glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <!-- Detector glow -->
+                    <filter id="det-glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="3" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <linearGradient id="beam-grad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="rgba(45,212,191,0.95)"/>
+                      <stop offset="100%" stop-color="rgba(45,212,191,0.25)"/>
+                    </linearGradient>
+                    <linearGradient id="efield-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(251,191,36,0.5)"/>
+                      <stop offset="100%" stop-color="rgba(251,191,36,0.05)"/>
+                    </linearGradient>
+                  </defs>
+                  <rect width="800" height="320" fill="url(#spec-grid)"/>
+
+                  <!-- Ion beam axis (faint reference) -->
+                  <line x1="60" y1="160" x2="360" y2="160" stroke="rgba(45,212,191,0.12)" stroke-width="1" stroke-dasharray="6,4"/>
+
+                  <!-- PINHOLE -->
+                  <g class="spec-part" data-part="pinhole">
+                    <ellipse cx="70" cy="160" rx="18" ry="50" fill="rgba(45,212,191,0.04)" stroke="rgba(148,163,184,0.4)" stroke-width="1.2"/>
+                    <circle cx="70" cy="160" r="3" fill="rgba(45,212,191,0.6)" stroke="rgba(45,212,191,0.8)" stroke-width="0.8"/>
+                    <!-- Pinhole dots pattern -->
+                    <circle cx="62" cy="145" r="1" fill="rgba(148,163,184,0.2)"/>
+                    <circle cx="78" cy="145" r="1" fill="rgba(148,163,184,0.2)"/>
+                    <circle cx="70" cy="138" r="1" fill="rgba(148,163,184,0.2)"/>
+                    <circle cx="62" cy="175" r="1" fill="rgba(148,163,184,0.2)"/>
+                    <circle cx="78" cy="175" r="1" fill="rgba(148,163,184,0.2)"/>
+                    <circle cx="70" cy="182" r="1" fill="rgba(148,163,184,0.2)"/>
+                    <circle cx="58" cy="160" r="1" fill="rgba(148,163,184,0.15)"/>
+                    <circle cx="82" cy="160" r="1" fill="rgba(148,163,184,0.15)"/>
+                    <text x="70" y="108" text-anchor="middle" class="spec-label">PINHOLE</text>
+                  </g>
+
+                  <!-- Beam from pinhole through E and drift (straight, bright) -->
+                  <line class="spec-beam-line" x1="73" y1="160" x2="360" y2="160" stroke="url(#beam-grad)" stroke-width="3" stroke-linecap="round">
+                    <animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.2s" repeatCount="indefinite"/>
+                  </line>
+
+                  <!-- ELECTRIC FIELD PLATES -->
+                  <g class="spec-part spec-part-electric" data-part="electric">
+                    <!-- Top plate (thickness similar to B-field poles) -->
+                    <rect x="190" y="98" width="100" height="30" rx="3" fill="rgba(251,191,36,0.08)" stroke="rgba(251,191,36,0.35)" stroke-width="1.2"/>
+                    <!-- Bottom plate -->
+                    <rect x="190" y="192" width="100" height="30" rx="3" fill="rgba(251,191,36,0.08)" stroke="rgba(251,191,36,0.35)" stroke-width="1.2"/>
+                    <!-- Field lines (hidden by default, shown on hover) -->
+                    <g class="spec-field-lines-e" opacity="0" fill="none" stroke="rgba(251,191,36,0.48)" stroke-width="0.95" stroke-linecap="round">
+                      <!-- Crosses (⊗): E into page — multiple rows between plates -->
+                      <g transform="translate(205,138)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(223,138)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(241,138)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(259,138)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(277,138)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(205,152)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(223,152)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(241,152)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(259,152)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(277,152)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(205,166)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(223,166)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(241,166)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(259,166)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(277,166)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(205,180)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(223,180)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(241,180)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(259,180)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                      <g transform="translate(277,180)">
+                        <line x1="-4" y1="-4" x2="4" y2="4"/>
+                        <line x1="-4" y1="4" x2="4" y2="-4"/>
+                      </g>
+                    </g>
+                    <!-- Plus/minus labels -->
+                    <text x="240" y="116" text-anchor="middle" class="spec-label-sm" fill="rgba(251,191,36,0.6)">+</text>
+                    <text x="240" y="216" text-anchor="middle" class="spec-label-sm" fill="rgba(251,191,36,0.6)">&minus;</text>
+                    <text x="240" y="82" text-anchor="middle" class="spec-label">E-FIELD PLATES</text>
+                    <!-- LiE length dimension -->
+                    <line x1="190" y1="236" x2="290" y2="236" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+                    <line x1="190" y1="232" x2="190" y2="240" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+                    <line x1="290" y1="232" x2="290" y2="240" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+                    <text x="240" y="250" text-anchor="middle" class="spec-dim">L<tspan baseline-shift="sub" font-size="7">iE</tspan></text>
+                    <!-- LfE: drift from E-plate exit to detector -->
+                    <line x1="290" y1="258" x2="680" y2="258" stroke="rgba(148,163,184,0.22)" stroke-width="0.8" stroke-dasharray="3,2"/>
+                    <line x1="290" y1="254" x2="290" y2="262" stroke="rgba(148,163,184,0.22)" stroke-width="0.8"/>
+                    <line x1="680" y1="254" x2="680" y2="262" stroke="rgba(148,163,184,0.22)" stroke-width="0.8"/>
+                    <text x="485" y="274" text-anchor="middle" class="spec-dim">L<tspan baseline-shift="sub" font-size="7">fE</tspan></text>
+                  </g>
+
+                  <!-- MAGNETIC FIELD POLES -->
+                  <g class="spec-part spec-part-magnetic" data-part="magnetic">
+                    <!-- Top pole -->
+                    <rect x="360" y="108" width="90" height="30" rx="3" fill="rgba(99,102,241,0.06)" stroke="rgba(99,102,241,0.35)" stroke-width="1.2"/>
+                    <!-- Bottom pole -->
+                    <rect x="360" y="182" width="90" height="30" rx="3" fill="rgba(99,102,241,0.06)" stroke="rgba(99,102,241,0.35)" stroke-width="1.2"/>
+                    <!-- B field arrows (hidden by default) -->
+                    <g class="spec-field-lines-b" opacity="0">
+                      <line x1="380" y1="140" x2="380" y2="180" stroke="rgba(99,102,241,0.4)" stroke-width="1"/>
+                      <line x1="405" y1="140" x2="405" y2="180" stroke="rgba(99,102,241,0.4)" stroke-width="1"/>
+                      <line x1="430" y1="140" x2="430" y2="180" stroke="rgba(99,102,241,0.4)" stroke-width="1"/>
+                      <!-- Arrows -->
+                      <polygon points="380,176 377,168 383,168" fill="rgba(99,102,241,0.5)"/>
+                      <polygon points="405,176 402,168 408,168" fill="rgba(99,102,241,0.5)"/>
+                      <polygon points="430,176 427,168 433,168" fill="rgba(99,102,241,0.5)"/>
+                    </g>
+                    <!-- N/S labels -->
+                    <text x="405" y="128" text-anchor="middle" class="spec-label-sm" fill="rgba(99,102,241,0.6)">N</text>
+                    <text x="405" y="202" text-anchor="middle" class="spec-label-sm" fill="rgba(99,102,241,0.6)">S</text>
+                    <text x="405" y="88" text-anchor="middle" class="spec-label">B-FIELD POLES</text>
+                    <!-- Length dimension -->
+                    <line x1="360" y1="230" x2="450" y2="230" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+                    <line x1="360" y1="226" x2="360" y2="234" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+                    <line x1="450" y1="226" x2="450" y2="234" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+                    <text x="405" y="244" text-anchor="middle" class="spec-dim">L<tspan baseline-shift="sub" font-size="7">iB</tspan></text>
+                  </g>
+
+                  <!-- Drift region with dimension lines -->
+                  <g class="spec-part" data-part="drift">
+                    <!-- Drift distance dimension (from magnet exit to detector) -->
+                    <line x1="450" y1="280" x2="680" y2="280" stroke="rgba(148,163,184,0.2)" stroke-width="0.8" stroke-dasharray="4,2"/>
+                    <line x1="450" y1="276" x2="450" y2="284" stroke="rgba(148,163,184,0.2)" stroke-width="0.8"/>
+                    <line x1="680" y1="276" x2="680" y2="284" stroke="rgba(148,163,184,0.2)" stroke-width="0.8"/>
+                    <text x="565" y="296" text-anchor="middle" class="spec-dim">L<tspan baseline-shift="sub" font-size="7">fB</tspan></text>
+                  </g>
+
+                  <!-- Trajectories: dispersion begins at B-field entrance (all bend the same way, slight spread) -->
+                  <path d="M 360,160 Q 520,162 680,172" fill="none" stroke="rgba(45,212,191,0.55)" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M 360,160 Q 518,163 680,178" fill="none" stroke="rgba(45,212,191,0.48)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M 360,160 Q 516,164 680,184" fill="none" stroke="rgba(99,102,241,0.45)" stroke-width="1.9" stroke-linecap="round"/>
+                  <path d="M 360,160 Q 514,165 680,190" fill="none" stroke="rgba(45,212,191,0.42)" stroke-width="1.85" stroke-linecap="round"/>
+
+                  <!-- DETECTOR PLANE -->
+                  <g class="spec-part spec-part-detector" data-part="detector">
+                    <rect x="680" y="105" width="12" height="110" rx="2" fill="rgba(45,212,191,0.06)" stroke="rgba(45,212,191,0.4)" stroke-width="1.2"/>
+                    <!-- Parabola traces on detector (same-side fan as beam) -->
+                    <path d="M 685,168 Q 686,178 686,198" fill="none" stroke="rgba(45,212,191,0.55)" stroke-width="1.4"/>
+                    <path d="M 685,172 Q 687,185 688,205" fill="none" stroke="rgba(99,102,241,0.48)" stroke-width="1.25"/>
+                    <circle cx="685" cy="168" r="2.2" fill="rgba(45,212,191,0.75)"/>
+                    <text x="720" y="108" text-anchor="middle" class="spec-label">DETECTOR</text>
+                  </g>
+
+                  <!-- Component connection dashed lines for clarity -->
+                  <line x1="290" y1="160" x2="360" y2="160" stroke="rgba(148,163,184,0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+
+                  <!-- Figure label -->
+                  <text x="14" y="310" class="spec-fig-label">FIG_001</text>
+                  <text x="786" y="16" text-anchor="end" class="spec-fig-label">THOMSON SPECTROMETER</text>
+                </svg>
+              </div>
+
+              <!-- Parameter inputs -->
+              <div class="spec-params">
+                <div class="spec-param-group" data-highlight="electric">
+                  <div class="spec-param-group-title">
+                    <span class="spec-param-dot" style="background:rgba(251,191,36,0.6)"></span>
+                    Electric field
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-E">
+                      E
+                      <span class="spec-info" data-tooltip="Electric field strength between the parallel plates, in kV/m. Determines the vertical deflection of ions on the detector.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-E" step="0.1" min="0" />
+                      <span class="spec-param-unit">kV/m</span>
+                    </div>
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-LiE">
+                      L<sub>iE</sub>
+                      <span class="spec-info" data-tooltip="Length of the electric field plates along the beam axis. Ions are deflected vertically while traversing this region.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-LiE" step="0.1" min="0" />
+                      <span class="spec-param-unit">cm</span>
+                    </div>
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-LfE">
+                      L<sub>fE</sub>
+                      <span class="spec-info" data-tooltip="Free-drift distance from the exit of the electric plates to the detector plane. Ions continue deflecting in the vertical direction during this drift.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-LfE" step="0.1" min="0" />
+                      <span class="spec-param-unit">cm</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="spec-param-group" data-highlight="magnetic">
+                  <div class="spec-param-group-title">
+                    <span class="spec-param-dot" style="background:rgba(99,102,241,0.6)"></span>
+                    Magnetic field
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-B">
+                      B
+                      <span class="spec-info" data-tooltip="Magnetic field strength between the pole faces, in mT. Determines the horizontal deflection of ions — heavier or faster ions deflect less.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-B" step="0.1" min="0" />
+                      <span class="spec-param-unit">mT</span>
+                    </div>
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-LiB">
+                      L<sub>iB</sub>
+                      <span class="spec-info" data-tooltip="Length of the magnetic field region along the beam axis. Ions are deflected horizontally while inside this region.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-LiB" step="0.1" min="0" />
+                      <span class="spec-param-unit">cm</span>
+                    </div>
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-LfB">
+                      L<sub>fB</sub>
+                      <span class="spec-info" data-tooltip="Free-drift distance from the exit of the magnetic field to the detector plane. This determines how much the horizontal separation grows before reaching the detector.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-LfB" step="0.1" min="0" />
+                      <span class="spec-param-unit">cm</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="spec-param-group" data-highlight="detector">
+                  <div class="spec-param-group-title">
+                    <span class="spec-param-dot" style="background:rgba(45,212,191,0.6)"></span>
+                    Detector
+                  </div>
+                  <div class="spec-param-row">
+                    <label class="spec-param-label" for="spec-det-size">
+                      Size
+                      <span class="spec-info" data-tooltip="Physical size of the detector (image plate). Used to compute the spatial scale (metres per pixel) from the image dimensions.">i</span>
+                    </label>
+                    <div class="spec-param-input-wrap">
+                      <input type="number" class="spec-param-input" id="spec-det-size" step="0.1" min="0" />
+                      <span class="spec-param-unit">cm</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-dialog-actions">
+              <button type="button" class="btn-spec-reset" id="btn-spec-reset">Reset defaults</button>
+              <button type="button" class="btn-settings-done" id="btn-spec-close">Done</button>
+            </div>
+          </div>
+        </dialog>
+
+        <div class="upload-actions">
+          <div class="settings-btn-wrap">
+            <button class="btn-settings" id="btn-settings" type="button" title="Analysis settings" aria-haspopup="dialog">
+              Settings
+            </button>
+          </div>
+          <button class="btn-upload" id="btn-upload" type="button" disabled>
+            <span class="btn-label">Analyse Image</span>
+            <span class="btn-spinner hidden" id="btn-spinner"></span>
+          </button>
+        </div>
+
+        <p class="error-msg hidden" id="error-msg"></p>
+      </div>
+
+      <div class="how-it-works">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text">
+            <strong>Upload</strong>
+            <span>Raw detector image</span>
+          </div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text">
+            <strong>Process</strong>
+            <span>Automated parabola fitting</span>
+          </div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text">
+            <strong>Explore</strong>
+            <span>Interactive results & spectra</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-learn" aria-labelledby="landing-learn-title">
+    <div class="landing-learn-inner">
+      <h2 class="landing-learn-title" id="landing-learn-title">How the pipeline works</h2>
+      <p class="landing-lead">
+        Oblisk turns a single Thomson parabola detector image into labelled ion tracks and energy spectra.
+        Electric and magnetic fields in the spectrometer separate ions by charge-to-mass ratio; each species draws
+        a distinct parabola on the plate. The software crops and denoises the image, finds smooth streaks, aligns
+        the detector frame, fits curvature, assigns species, then integrates flux along each parabola to build
+        <span class="landing-formula">d<span class="landing-n">N</span>/d<span class="landing-e">E</span></span> histograms.
+      </p>
+
+      <ol class="landing-steps">
+        <li><strong>Preprocess</strong> — ROI crop (neural detector), then U-Net or morphological denoising.</li>
+        <li><strong>Background</strong> — Estimate a uniform background and subtract it for sampling.</li>
+        <li><strong>Traces</strong> — Enhance streaks, track line centers, smooth polyline outliers.</li>
+        <li><strong>Alignment</strong> — Fit origin, rotation, and axes so tracks match canonical parabolas.</li>
+        <li><strong>Classify</strong> — Compare fitted curvature to species ladders from your spectrometer model.</li>
+        <li><strong>Spectra</strong> — Sample intensity along theoretical tracks and map position to ion energy.</li>
+      </ol>
+
+      <div class="landing-split">
+        <figure class="landing-figure">
+          <div class="landing-detector-img-wrap">
+            <img
+              src="/synthetic/demo-landing-detector.png"
+              width="1096"
+              height="1096"
+              alt="Synthetic Thomson parabola detector image: several bright curved ion tracks against noise"
+              class="landing-detector-img"
+              loading="lazy"
+            />
+          </div>
+          <figcaption class="landing-caption">
+            Synthetic example: multiple parabolas (different <span class="landing-mq">m/q</span>) like the ones Oblisk segments and classifies.
+          </figcaption>
+        </figure>
+
+        <div class="landing-viz-column">
+          <div class="landing-viz-card">
+            <h3 class="landing-viz-title">Interactive detector preview</h3>
+            <p class="landing-viz-sub">
+              Same viewer as on the results page — hover a track for species and curvature, click for a demo energy spectrum.
+              Coordinates are illustrative only.
+            </p>
+            <div id="landing-iv-container" class="iv-container landing-iv-container--embed"></div>
+          </div>
+          <div class="landing-viz-card landing-viz-card--schematic">
+            <h3 class="landing-viz-title">Beamline at a glance</h3>
+            <p class="landing-viz-sub">
+              Pinhole, parallel <strong class="landing-hi-e">E</strong> and <strong class="landing-hi-b">B</strong> regions, then curved trajectories landing on the detector.
+              Hover parts of the diagram. Full geometry lives under <strong>Settings → Spectrometer geometry</strong> when you upload.
+            </p>
+            <object
+              class="landing-spec-object"
+              data="/spectrometer-landing.svg"
+              type="image/svg+xml"
+              aria-label="Diagram: ion beam through electric plates, magnet poles, and detector"
+              width="640"
+              height="200"
+            >
+              Diagram (SVG)
+            </object>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="site-footer-inner">
+      <p class="site-footer-line">
+        This website is developed at the <strong>Czech Technical University in Prague</strong>,
+        Faculty of Nuclear Sciences and Physical Engineering.
+      </p>
+      <p class="site-footer-line">
+        Main developer: Artem Shelamanov.
+        Contact:
+        <a href="mailto:artdoctorka@gmail.com">artdoctorka@gmail.com</a> (personal),
+        <a href="mailto:shelaart@cvut.cz">shelaart@cvut.cz</a> (university).
+      </p>
+      <p class="site-footer-year">© 2026</p>
+    </div>
+  </footer>
+
+  <div class="recent-overlay hidden" id="recent-overlay" aria-hidden="true"></div>
+  <aside
+    class="recent-sidebar"
+    id="recent-sidebar"
+    aria-label="Recent analyses"
+    aria-hidden="true"
+  >
+    <div class="recent-sidebar-head">
+      <h2 class="recent-sidebar-title">Recent analyses</h2>
+      <button type="button" class="recent-sidebar-close" id="recent-sidebar-close" aria-label="Close">
+        ✕
+      </button>
+    </div>
+    <div class="recent-list" id="recent-list"></div>
+  </aside>
+
+  <script src="/upload.ts" type="module"></script>
+</body>
+</html>
