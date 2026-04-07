@@ -46,4 +46,4 @@ $$ v = \frac{q \cdot B \cdot L_{iB} \cdot (L_{iB}/2 + L_{fB})}{m \cdot X'} $$
 
 From $v$, the kinetic energy $E_k$ in Joules is:
 $$ E_k = \frac{1}{2} m v^2 $$
-This value is subsequently converted to electron-volts (keV or MeV) for spectra plotting. The calculations are handled in `utils/energy.py` and `utils/physics.py`.
+This value is subsequently converted to electron-volts (keV or MeV) for spectra plotting. The calculations are handled in `oblisk/analysis/energy.py` and `oblisk/analysis/physics.py`.

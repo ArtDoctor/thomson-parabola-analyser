@@ -26,4 +26,4 @@ The training-side workflow remains in `unet-denoiser/`, with:
 
 - `train.py` as the script entrypoint
 - `train.ipynb` as the notebook workflow
-- `utils/` as the training-only dataset/model/loss helpers
+- `unet-denoiser/utils/` as the training-only dataset/model/loss helpers

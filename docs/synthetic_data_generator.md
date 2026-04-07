@@ -22,8 +22,8 @@ When simulating complex features like fringe fields (smooth `tanh` field boundar
 The Python scripts in `synthetic_data/` wrap the C++ engine to generate comprehensive datasets:
 
 - **`generate_synthetic_dataset.py`**: Automates the execution of the C++ binary across randomized configurations to create a diverse dataset.
-- **`utils/noise.py` & `noise_adder.ipynb`**: Applies realistic IP (Image Plate) noise, background gradients, and artifacts to the clean Monte Carlo hit maps, bridging the domain gap between simulation and real experimental data.
-- **`utils/hits_to_img.py`**: Converts the raw 2D coordinate text files (`hits.txt`) into 2D histogram images.
+- **`synthetic_data/utils/noise.py` & `noise_adder.ipynb`**: Applies realistic IP (Image Plate) noise, background gradients, and artifacts to the clean Monte Carlo hit maps, bridging the domain gap between simulation and real experimental data.
+- **`synthetic_data/utils/hits_to_img.py`**: Converts the raw 2D coordinate text files (`hits.txt`) into 2D histogram images.
 
 ## Outputs
 

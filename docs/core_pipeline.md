@@ -1,10 +1,10 @@
 # Core Processing Pipeline
 
-The core processing pipeline orchestrates the transformation of a raw Thomson parabola image into physical energy spectra. It integrates all individual components (YOLO, UNet, Physics formulas) into a cohesive workflow.
+The core processing pipeline orchestrates the transformation of a raw Thomson parabola image into physical energy spectra. It integrates all individual components (YOLO, UNet, physics) into a cohesive workflow. Implementation lives in the `oblisk` package: `oblisk/processing/pipeline.py` wires stages together, with helpers in `oblisk/processing/` and `oblisk/analysis/`.
 
 ## 1. Image Preprocessing
 - **ROI Cropping:** Uses the YOLO model (`thomson-cutter.onnx`) to discard irrelevant edges and borders.
-- **Denoising:** Uses the UNet denoiser (`unet_denoise.py`) to suppress background radiation noise while preserving continuous ion traces.
+- **Denoising:** Uses the UNet denoiser via `oblisk/runtime_unet.py` (weights from `unet-denoiser/`) to suppress background radiation noise while preserving continuous ion traces.
 
 ## 2. Background Subtraction
 - Extracts a background intensity estimate from a region devoid of ion traces. This scalar value (`bg_mean`) is subtracted from the image during energy sampling to ensure accurate flux integration.
@@ -12,7 +12,7 @@ The core processing pipeline orchestrates the transformation of a raw Thomson pa
 ## 3. Trace Detection & Smoothing
 - **Morphological Operations:** Enhances the contrast of continuous streaks against the background.
 - **Line Tracking:** Traces the center of intensity for each observed streak.
-- **Smoothing (`utils/line_processing.py`):** Uses a sliding window median approach to detect and correct outlier points in the traced lines, applying a moving average to ensure physical continuity.
+- **Smoothing (`oblisk/processing/line_processing.py`):** Uses a sliding window median approach to detect and correct outlier points in the traced lines, applying a moving average to ensure physical continuity.
 
 ## 4. Frame Alignment
 - The detector plate is rarely perfectly aligned with the magnetic and electric axes.
@@ -25,5 +25,5 @@ The core processing pipeline orchestrates the transformation of a raw Thomson pa
 
 ## 6. Energy Spectra Extraction
 - **Sampling:** Intensity is sampled along the exact theoretical trajectory of the classified parabola, ensuring even faint signals are captured correctly.
-- **Energy Mapping:** The physical distance $X'$ of each sample from the origin is converted to kinetic energy using the established electromagnetic deflection formulas (`utils/energy.py`).
+- **Energy Mapping:** The physical distance $X'$ of each sample from the origin is converted to kinetic energy using the established electromagnetic deflection formulas (`oblisk/analysis/energy.py`, with spectrometer constants in `oblisk/analysis/physics.py`).
 - **Plotting:** Final spectra are aggregated and plotted, yielding $\text{d}N/\text{d}E$ histograms for physical analysis.

@@ -64,14 +64,21 @@ The browser UI lives under `web/` and uses the same core Python package. The bac
 
 ## Repository Layout
 
+- `main.py`: thin entrypoint that calls `oblisk.cli.main`
 - `oblisk/`: main Python package for runtime analysis, preprocessing, reporting, and shared services
+  - `analysis/`: physics and energy mapping, geometry fitting, trace detection, spectra, classification
+  - `processing/`: preprocessing, pipeline orchestration (`pipeline*.py`), morphological and line helpers
+  - `reporting/`: `res.json` models, batch summaries, evaluation reports
+  - `cli.py`, `config.py`, `runtime.py`: CLI, defaults, and high-level run wiring
+  - `runtime_yolo.py` / `runtime_unet.py`: ONNX YOLO crop and UNet denoise inference
 - `tests/`: unit, smoke, synthetic-regression, and integration coverage
-- `docs/`: pipeline notes, subsystem docs, attempts, and supporting research material
-- `synthetic_data/`: simulator and dataset-generation utilities
-- `unet-denoiser/`: UNet training workflow and artifacts
+- `docs/`: pipeline notes, subsystem docs, and supporting material
+- `synthetic_data/`: C++ Monte Carlo tracker, Python dataset tools, and `synthetic_data/utils/` (noise and hit rasterization)
+- `unet-denoiser/`: UNet training workflow and checkpoints (`train.py`, notebook, training `utils/`)
 - `yolo-tune/`: detector-model training assets and exported ONNX runtime model
-- `web/`: FastAPI backend and Vite frontend
+- `web/`: FastAPI backend (`web/backend/`) and Vite frontend (`web/frontend/`), plus `web/tests/` for e2e
 - `eval_synth/`: local synthetic evaluation dataset (optional; generated)
+- `outputs/`: example CLI output (not authoritative; your runs go where you point `--output-dir`)
 
 ## More Detail
 
