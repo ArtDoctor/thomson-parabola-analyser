@@ -33,7 +33,7 @@ def run_classification_and_xp_span(
 ) -> tuple[
     list[dict[str, Any]],
     dict[str, Any],
-    np.ndarray,
+    tuple[float, float],
     float,
     HydrogenReferenceLog,
     float,

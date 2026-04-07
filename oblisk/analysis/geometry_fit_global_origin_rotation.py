@@ -15,7 +15,17 @@ def solve_rotation_only(
     k1_init: float,
     k2_init: float,
     max_nfev: int,
-) -> tuple[float, float, float, float, float, float, np.ndarray, list[PathStep]]:
+) -> tuple[
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    np.ndarray,
+    list[PathStep],
+]:
     def residuals_rot_only(p: np.ndarray) -> np.ndarray:
         theta_fit_local = float(p[0])
         gamma_fit_local = float(p[1])

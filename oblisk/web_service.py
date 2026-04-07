@@ -22,21 +22,28 @@ def build_web_settings(
         if classification_element_symbols is not None
         else list(DEFAULT_CLASSIFICATION_ELEMENTS)
     )
-    spec_kwargs: dict[str, float | None] = {}
+    spec_E_kVm: float | None = None
+    spec_LiE_cm: float | None = None
+    spec_LfE_cm: float | None = None
+    spec_B_mT: float | None = None
+    spec_LiB_cm: float | None = None
+    spec_LfB_cm: float | None = None
+    spec_detector_size_cm: float | None = None
     if spectrometer_params:
-        _map = {
-            "E_kVm": "spec_E_kVm",
-            "LiE_cm": "spec_LiE_cm",
-            "LfE_cm": "spec_LfE_cm",
-            "B_mT": "spec_B_mT",
-            "LiB_cm": "spec_LiB_cm",
-            "LfB_cm": "spec_LfB_cm",
-            "detector_size_cm": "spec_detector_size_cm",
-        }
-        for src_key, dst_key in _map.items():
-            val = spectrometer_params.get(src_key)
-            if val is not None:
-                spec_kwargs[dst_key] = float(val)
+        if (v := spectrometer_params.get("E_kVm")) is not None:
+            spec_E_kVm = float(v)
+        if (v := spectrometer_params.get("LiE_cm")) is not None:
+            spec_LiE_cm = float(v)
+        if (v := spectrometer_params.get("LfE_cm")) is not None:
+            spec_LfE_cm = float(v)
+        if (v := spectrometer_params.get("B_mT")) is not None:
+            spec_B_mT = float(v)
+        if (v := spectrometer_params.get("LiB_cm")) is not None:
+            spec_LiB_cm = float(v)
+        if (v := spectrometer_params.get("LfB_cm")) is not None:
+            spec_LfB_cm = float(v)
+        if (v := spectrometer_params.get("detector_size_cm")) is not None:
+            spec_detector_size_cm = float(v)
     return Settings(
         denoise=True,
         denoise_kernel_size=5,
@@ -52,7 +59,13 @@ def build_web_settings(
             WEB_INNER_MARGIN_CROP_PX if inner_margin_crop else 0
         ),
         classification_element_symbols=elems,
-        **spec_kwargs,
+        spec_E_kVm=spec_E_kVm,
+        spec_LiE_cm=spec_LiE_cm,
+        spec_LfE_cm=spec_LfE_cm,
+        spec_B_mT=spec_B_mT,
+        spec_LiB_cm=spec_LiB_cm,
+        spec_LfB_cm=spec_LfB_cm,
+        spec_detector_size_cm=spec_detector_size_cm,
     )
 
 
