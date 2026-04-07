@@ -2,6 +2,8 @@
 
 Oblisk is an end-to-end Thomson parabola spectrometer analysis repository.
 
+Web version can be accessed at: https://thomson-parabolas.shelamanov.com
+
 The main runtime path is:
 
 1. load a detector image
